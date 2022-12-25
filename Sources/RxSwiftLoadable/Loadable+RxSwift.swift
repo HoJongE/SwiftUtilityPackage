@@ -7,8 +7,9 @@
 
 import Loadable
 import RxSwift
+import RxRelay
 
-extension Observable {
+public extension Observable {
 
     func sinkToLoadable(_ completion: @escaping (Loadable<Element>) -> Void) -> Disposable {
         subscribe(onNext: {
@@ -16,6 +17,18 @@ extension Observable {
         }, onError: {
             completion(.failed($0))
         })
+    }
+
+    func bindLoadable(to relay: PublishRelay<Loadable<Element>>) -> Disposable {
+        sinkToLoadable {
+            relay.accept($0)
+        }
+    }
+
+    func bindLoadable(to relay: BehaviorRelay<Loadable<Element>>) -> Disposable {
+        sinkToLoadable {
+            relay.accept($0)
+        }
     }
 
 }

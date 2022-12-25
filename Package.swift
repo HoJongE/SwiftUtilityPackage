@@ -34,7 +34,7 @@ let package = Package(
             targets: [uikitPreview])
     ],
     dependencies: [
-        .package(url: "https://github.com/ReactiveX/RxSwift", "5.0.0"..<"7.0.0")
+        .package(url: "https://github.com/ReactiveX/RxSwift", "5.0.0"..<"9.0.0"),
     ],
     targets: [
         .target(
@@ -47,8 +47,12 @@ let package = Package(
             name: loadableRxSwift,
             dependencies: [
                 .init(stringLiteral: loadable),
-                .product(name: "RxSwift", package: "RxSwift")
+                .product(name: "RxSwift", package: "RxSwift"),
+                .product(name: "RxRelay", package: "RxSwift")
             ]),
-        .target(name: uikitPreview)
+        .target(name: uikitPreview),
+        .testTarget(
+            name: testTargetName(fromTarget: loadableCombine),
+            dependencies: [.init(stringLiteral: loadableCombine)])
     ]
 )
