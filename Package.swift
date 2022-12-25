@@ -3,26 +3,52 @@
 
 import PackageDescription
 
+let loadable: String = "Loadable"
+let loadableCombine: String = "CombineLoadable"
+let loadableRxSwift: String = "RxSwiftLoadable"
+let uikitPreview: String = "UIKitPreview"
+
+func testTargetName(fromTarget originalTarget: String) -> String {
+    "\(originalTarget)Tests"
+}
+
 let package = Package(
     name: "HoJongUtility",
+    platforms: [.iOS(.v13), .macOS(.v11)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "HoJongUtility",
-            targets: ["HoJongUtility"]),
+            name: loadable,
+            type: .static,
+            targets: [loadable]),
+        .library(
+            name: loadableCombine,
+            type: .static,
+            targets: [loadableCombine]),
+        .library(
+            name: loadableRxSwift,
+            targets: [loadableRxSwift]),
+        .library(
+            name: uikitPreview,
+            type: .static,
+            targets: [uikitPreview])
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
+        .package(url: "https://github.com/ReactiveX/RxSwift", from: "6.0.0")
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "HoJongUtility",
+            name: loadable,
             dependencies: []),
-        .testTarget(
-            name: "HoJongUtilityTests",
-            dependencies: ["HoJongUtility"]),
+        .target(
+            name: loadableCombine,
+            dependencies: [.init(stringLiteral: loadable)]),
+        .target(
+            name: loadableRxSwift,
+            dependencies: [
+                .init(stringLiteral: loadable),
+                .product(name: "RxSwift", package: "RxSwift")
+            ]),
+        .target(name: uikitPreview)
     ]
 )
