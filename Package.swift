@@ -34,7 +34,7 @@ let package = Package(
             targets: [uikitPreview])
     ],
     dependencies: [
-        .package(url: "https://github.com/ReactiveX/RxSwift", from: "6.0.0")
+        .package(url: "https://github.com/ReactiveX/RxSwift", "5.0.0"..<"7.0.0")
     ],
     targets: [
         .target(
