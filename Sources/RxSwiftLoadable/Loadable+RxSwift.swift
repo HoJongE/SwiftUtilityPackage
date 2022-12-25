@@ -9,7 +9,7 @@ import Loadable
 import RxSwift
 import RxRelay
 
-public extension Observable {
+public extension ObservableType {
 
     func sinkToLoadable(_ completion: @escaping (Loadable<Element>) -> Void) -> Disposable {
         subscribe(onNext: {
