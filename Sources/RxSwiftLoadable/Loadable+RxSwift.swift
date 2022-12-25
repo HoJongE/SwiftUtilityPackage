@@ -32,3 +32,18 @@ public extension ObservableType {
     }
 
 }
+
+extension PrimitiveSequence {
+
+    public func bindLoadable(to relay: PublishRelay<Loadable<Element>>) -> Disposable {
+        asObservable()
+            .bindLoadable(to: relay)
+    }
+
+    public func bindLoadable(to relay: BehaviorRelay<Loadable<Element>>) -> Disposable {
+        asObservable()
+            .bindLoadable(to: relay)
+    }
+
+
+}
