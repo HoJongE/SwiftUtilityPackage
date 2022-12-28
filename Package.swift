@@ -7,6 +7,7 @@ let loadable: String = "Loadable"
 let loadableCombine: String = "CombineLoadable"
 let loadableRxSwift: String = "RxSwiftLoadable"
 let uikitPreview: String = "UIKitPreview"
+let asyncImageView: String = "AsyncImageView"
 
 func testTargetName(fromTarget originalTarget: String) -> String {
     "\(originalTarget)Tests"
@@ -31,7 +32,10 @@ let package = Package(
         .library(
             name: uikitPreview,
             type: .static,
-            targets: [uikitPreview])
+            targets: [uikitPreview]),
+        .library(
+            name: asyncImageView,
+            targets: [asyncImageView])
     ],
     dependencies: [
         .package(url: "https://github.com/ReactiveX/RxSwift", "5.0.0"..<"9.0.0"),
@@ -51,6 +55,10 @@ let package = Package(
                 .product(name: "RxRelay", package: "RxSwift")
             ]),
         .target(name: uikitPreview),
+        .target(
+            name: asyncImageView,
+            dependencies: [.init(stringLiteral: loadableCombine)]
+        ),
         .testTarget(
             name: testTargetName(fromTarget: loadableCombine),
             dependencies: [.init(stringLiteral: loadableCombine)])
