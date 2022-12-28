@@ -17,7 +17,9 @@ final class ImageLoader {
 
     private init() { }
 
-    func image(of url: URL) -> AnyPublisher<UIImage, Error> {
+    func image(
+        of url: URL,
+        options: [ImageProcessor]) -> AnyPublisher<UIImage, Error> {
         inMemoryImageSource
             .image(of: url)
             .catch { [diskImageSource, inMemoryImageSource] _ in
@@ -35,15 +37,36 @@ final class ImageLoader {
                         diskImageSource.saveToCache($0, forKey: url)
                     })
             }
+            .map { [weak self] image in
+                return self?.processing(image: image, options: options) ?? image
+            }
             .subscribe(on: DispatchQueue.global(qos: .userInitiated))
             .eraseToAnyPublisher()
     }
 
-    func image(of url: String) -> AnyPublisher<UIImage, Error> {
+    func image(
+        of url: String,
+        options: [ImageProcessor]) -> AnyPublisher<UIImage, Error> {
         guard let url = URL(string: url) else {
             return Fail(outputType: UIImage.self, failure: URLError(.badURL))
                 .eraseToAnyPublisher()
         }
-        return image(of: url)
+        return image(of: url, options: options)
     }
+}
+
+private extension ImageLoader {
+
+    func processing(image: UIImage, options: [ImageProcessor]) -> UIImage {
+        guard var ciImage: CIImage = image.ciImage ?? CIImage(image: image) else {
+            return image
+        }
+
+        for option in options {
+            ciImage = option.processing(ciImage)
+        }
+
+        return UIImage(ciImage: ciImage)
+    }
+
 }

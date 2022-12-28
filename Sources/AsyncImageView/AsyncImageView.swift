@@ -20,14 +20,6 @@ public final class AsyncImageView: UIImageView {
     private let imageState: PassthroughSubject<Loadable<UIImage>, Never> = .init()
 
     private let imageLoader: ImageLoader = .shared
-    private var url: URL? = nil {
-        didSet {
-            guard let url else {
-                return
-            }
-            image(from: url)
-        }
-    }
 
     private var progressView: UIActivityIndicatorView?
     private var errorView: UIView?
@@ -52,12 +44,27 @@ public final class AsyncImageView: UIImageView {
 // MARK: - Public API
 public extension AsyncImageView {
 
-    func setImage(from url: URL) {
-        self.url = url
+    func setImage(
+        from url: URL,
+        options: [ImageProcessor] = []
+    ) {
+        image(
+            from: url,
+            options: options
+        )
     }
 
-    func setImage(fromURL url: String) {
-        self.url = URL(string: url)
+    func setImage(
+        fromURL url: String,
+        options: [ImageProcessor] = []
+    ) {
+        guard let url = URL(string: url) else {
+            return
+        }
+        setImage(
+            from: url,
+            options: options
+        )
     }
 
 }
@@ -105,22 +112,26 @@ private extension AsyncImageView {
         progressView = nil
     }
 
-    func image(from url: URL) {
-        cancelPreviousLoading()
-        loadImageFromLoader(from: url)
-    }
+    func image(
+        from url: URL,
+        options: [ImageProcessor]) {
+            cancelPreviousLoading()
+            loadImageFromLoader(from: url, options: options)
+        }
 
     func cancelPreviousLoading() {
         imageState.send(.notRequested)
         lastSubscription?.cancel()
     }
 
-    func loadImageFromLoader(from url: URL) {
-        imageState.send(.isLoading(last: image))
-        lastSubscription = imageLoader
-            .image(of: url)
-            .retry(retryCountWhenFail)
-            .receive(on: DispatchQueue.main)
-            .bindLoadable(to: imageState)
-    }
+    func loadImageFromLoader(
+        from url: URL,
+        options: [ImageProcessor]) {
+            imageState.send(.isLoading(last: image))
+            lastSubscription = imageLoader
+                .image(of: url, options: options)
+                .retry(retryCountWhenFail)
+                .receive(on: DispatchQueue.main)
+                .bindLoadable(to: imageState)
+        }
 }
